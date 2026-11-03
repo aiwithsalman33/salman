@@ -18,12 +18,12 @@ Copy `.env.example` to `.env.local`:
 | Variable | Purpose |
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | Public URL once the domain is chosen (canonical + OG URLs) |
-| `CONTACT_WEBHOOK_URL` | Contact submissions are POSTed here as JSON (n8n, Make.com, Formspree…). Unset: the form tells visitors it isn't connected yet |
-| `CONTACT_WEBHOOK_SECRET` | Optional; sent as `x-contact-secret` |
+
+The contact form needs no backend: it opens WhatsApp (`wa.me`) with the enquiry pre-filled for the number in `src/data/social-links.ts`.
 
 ## Content
 
-All copy lives in `src/data/`. Unconfirmed details (`email`, `youtube`, `learnerCount` in `social-links.ts`; the ZenXAI summary in `experience.ts`) are `null`/empty and are left off the page until filled in. Every project has a `provenance` label. The current employer is never named; use "current role".
+All copy lives in `src/data/`: `work.ts` (four categories, 13 projects), `skills.ts`, `experience.ts`, `achievements.ts`, `social-links.ts`. Unconfirmed details (`email`, `youtube`, `learnerCount`; the Axxeler start date) are `null`/omitted and left off the page until filled in. Workflow diagrams marked `illustrative` are sample steps, and `tech` lists only confirmed tools. The former employer named in the original planning brief must never appear on the site or in this repo.
 
 ## Status
 

@@ -12,8 +12,7 @@
   /* Form errors only. */
   --color-alert: #ff8a8a;
 
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 
   /* Fluid type scale: 12 · 14 · 17 · 22 · 30 · 56 · 92 */
   --text-micro: 0.75rem;

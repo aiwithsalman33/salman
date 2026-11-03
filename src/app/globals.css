@@ -90,25 +90,19 @@
     padding-block: clamp(96px, 11vw, 160px);
   }
 
-  /* Display type: Archivo's width axis carries the voice. Narrower on phones so long words fit. */
+  /* Display type: Poppins Bold, tightened. */
   .display {
-    font-stretch: 112.5%;
-    font-weight: 780;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.025em;
   }
 
-  @media (min-width: 1024px) {
-    .display {
-      font-stretch: 125%;
-    }
-  }
-
+  /* Metadata: Poppins Medium, small, slightly tracked. */
   .telemetry {
-    font-family: var(--font-mono);
     font-size: var(--text-micro);
-    line-height: 1.4;
+    font-weight: 500;
+    line-height: 1.45;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
   }
 
   .skip-link {
@@ -130,7 +124,7 @@
 }
 
 /* ---------- Boot sequence: the one orchestrated load moment ----------
-   Lines appear 0.1–1.0s, the overlay fades at 1.4s, and the hero headline widens from 62% as the core ignites.
+   Lines appear 0.1–1.0s, the overlay fades at 1.4s, and the hero headline resolves line by line as the core ignites.
    Repeat visits (data-boot="repeat") and "Skip intro" (data-boot="skipped") go straight to the ignite. */
 .boot {
   position: fixed;
@@ -183,8 +177,9 @@ html[data-boot] .boot-skip {
   display: none;
 }
 
+/* Transform, opacity and blur only, so the headline never reflows while it animates. */
 @keyframes ignite {
-  from { font-stretch: 62%; opacity: 0; }
+  from { opacity: 0; translate: 0 0.35em; filter: blur(10px); }
 }
 
 @keyframes core-ignite {
@@ -241,13 +236,19 @@ html[data-scene="3d"] .scene-canvas {
 }
 
 .hero-core,
-.constellation-2d {
+.glyph-2d {
   transition: opacity 0.8s ease;
 }
 
-html[data-scene="3d"] .hero-core,
-html[data-scene="3d"] .constellation-2d {
+html[data-scene="3d"] .hero-core {
   opacity: 0;
+}
+
+/* Desktop only: on portrait screens the 3D environments sit off to the side, so the glyph stays. */
+@media (min-width: 1024px) {
+  html[data-scene="3d"] .glyph-2d {
+    opacity: 0;
+  }
 }
 
 /* ---------- Scroll progress (value from ScrollProgress) ---------- */
@@ -369,6 +370,7 @@ dialog.menu-sheet {
   border: 0;
   background: var(--color-void);
   color: var(--color-fg);
+  overflow-y: auto;
 }
 
 dialog.menu-sheet::backdrop {
@@ -418,7 +420,7 @@ dialog.menu-sheet::backdrop {
 @media (min-width: 1024px) {
   .bank {
     flex-direction: row;
-    height: 520px;
+    height: 560px;
     border: 1px solid var(--color-hairline);
   }
 
@@ -460,6 +462,7 @@ dialog.menu-sheet::backdrop {
     writing-mode: vertical-rl;
     rotate: 180deg;
     white-space: nowrap;
+    font-size: var(--text-lead);
   }
 
   .bank-module[data-open="true"] .bank-trigger {
@@ -612,6 +615,114 @@ dialog.case-sheet::backdrop {
   .bank-panel:not([hidden]) {
     animation: follow-in 0.5s var(--ease-out-expo) 0.12s backwards;
   }
+}
+
+/* ---------- Work categories ---------- */
+/* Big outlined category number in the category accent. */
+.category-number {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--accent);
+  line-height: 1;
+}
+
+/* Workflow pipeline: numbered steps joined by a vertical line. */
+.workflow {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.workflow-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.workflow-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: -12px;
+  width: 1px;
+  background: var(--color-hairline-strong);
+}
+
+.workflow-index {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 27px;
+  height: 27px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent, var(--color-signal)) 55%, transparent);
+  background: var(--color-void);
+  color: var(--accent, var(--color-signal));
+  font-size: var(--text-micro);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A highlight runs down the pipeline, one step after another. */
+  .workflow-index {
+    animation: step-glow calc(var(--n) * 0.7s) ease-in-out calc(var(--i) * 0.7s) infinite;
+  }
+
+  .preview-content {
+    animation: follow-in 0.45s var(--ease-out-expo) backwards;
+  }
+
+  .glyph-flow {
+    stroke-dasharray: 5 7;
+    animation: glyph-flow 1.6s linear infinite;
+  }
+
+  .glyph-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: glyph-pulse 2.4s ease-in-out infinite;
+  }
+
+  .glyph-orbit {
+    transform-origin: 120px 80px;
+    animation: glyph-orbit 14s linear infinite;
+  }
+
+  .glyph-bar {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: glyph-bar 1.4s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes step-glow {
+  0%,
+  18% {
+    background: var(--accent, var(--color-signal));
+    color: var(--color-void);
+  }
+  36%,
+  100% {
+    background: var(--color-void);
+  }
+}
+
+@keyframes glyph-flow {
+  to { stroke-dashoffset: -24; }
+}
+
+@keyframes glyph-pulse {
+  50% { scale: 1.12; opacity: 0.7; }
+}
+
+@keyframes glyph-orbit {
+  to { rotate: 360deg; }
+}
+
+@keyframes glyph-bar {
+  from { scale: 1 0.45; }
+  to { scale: 1 1; }
 }
 
 /* ---------- Form fields ---------- */

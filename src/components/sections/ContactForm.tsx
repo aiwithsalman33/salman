@@ -1,26 +1,31 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { instagram } from "@/data/social-links";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { whatsappLink } from "@/data/social-links";
 import { projectTypes, validateContact, type ContactErrors, type ContactPayload } from "@/lib/contact";
-import { buttonClass, TextLink } from "@/components/ui/Button";
+import { buttonClass, ButtonLink } from "@/components/ui/Button";
 
-type Status =
-  | { state: "idle" }
-  | { state: "sending" }
-  | { state: "sent"; email: string }
-  | { state: "error"; message: string; offerInstagram?: boolean };
+function composeMessage({ name, email, projectType, message }: ContactPayload) {
+  return [
+    "Hi Salman, I'd like to talk about a project.",
+    "",
+    `Name: ${name.trim()}`,
+    `Email: ${email.trim()}`,
+    `Project type: ${projectType}`,
+    "",
+    message.trim(),
+  ].join("\n");
+}
 
+/**
+ * Collects the enquiry, then opens WhatsApp with it pre-filled. Nothing is stored or sent by the site:
+ * the visitor presses send in WhatsApp themselves.
+ */
 export function ContactForm() {
-  const [status, setStatus] = useState<Status>({ state: "idle" });
+  const [chatUrl, setChatUrl] = useState<string | null>(null);
   const [errors, setErrors] = useState<ContactErrors>({});
-  const startedAt = useRef(0);
 
-  useEffect(() => {
-    startedAt.current = Date.now();
-  }, []);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
@@ -39,57 +44,39 @@ export function ContactForm() {
       return;
     }
 
-    setStatus({ state: "sending" });
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...payload, website: data.get("website"), startedAt: startedAt.current }),
-      });
-      const result: { ok?: boolean; error?: string; fields?: ContactErrors } = await response.json();
-
-      if (response.ok && result.ok) {
-        form.reset();
-        setStatus({ state: "sent", email: payload.email });
-      } else if (result.error === "invalid_fields" && result.fields) {
-        setErrors(result.fields);
-        setStatus({ state: "idle" });
-      } else if (result.error === "not_configured") {
-        setStatus({
-          state: "error",
-          message: "The contact form isn't connected yet, so your message wasn't sent. Message me on Instagram instead.",
-          offerInstagram: true,
-        });
-      } else {
-        setStatus({
-          state: "error",
-          message: "Your message wasn't sent because the server couldn't deliver it. Try again in a minute, or message me on Instagram.",
-          offerInstagram: true,
-        });
-      }
-    } catch {
-      setStatus({ state: "error", message: "Your message wasn't sent. Check your connection and try again." });
-    }
+    const url = whatsappLink(composeMessage(payload));
+    // Opened inside the submit handler so browsers treat it as user-initiated.
+    window.open(url, "_blank", "noopener,noreferrer");
+    form.reset();
+    setChatUrl(url);
   }
 
-  if (status.state === "sent") {
+  if (chatUrl) {
     return (
       <div role="status" className="border border-go/40 p-6 sm:p-8">
-        <p className="display text-h3 text-go">Message sent</p>
-        <p className="mt-3 text-steel">I&apos;ll reply to {status.email}.</p>
-        <button
-          type="button"
-          onClick={() => setStatus({ state: "idle" })}
-          className="mt-6 text-meta font-medium underline underline-offset-4 hover:text-signal"
-        >
-          Send another message
-        </button>
+        <p className="display text-h3 text-go">WhatsApp is ready</p>
+        <p className="mt-3 max-w-[48ch] text-steel">
+          Your message is filled in. Press send in WhatsApp to deliver it. If WhatsApp didn&apos;t open, use the button
+          below.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <ButtonLink href={chatUrl} external>
+            Open WhatsApp
+          </ButtonLink>
+          <button
+            type="button"
+            onClick={() => setChatUrl(null)}
+            className="text-meta font-medium underline underline-offset-4 hover:text-signal"
+          >
+            Write another message
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <form id="contact-form" noValidate onSubmit={handleSubmit} aria-describedby="contact-status" className="flex flex-col gap-6">
+    <form id="contact-form" noValidate onSubmit={handleSubmit} className="flex flex-col gap-6">
       <Field id="contact-name" label="Name" error={errors.name}>
         <input id="contact-name" name="name" type="text" autoComplete="name" required className="field" {...describedBy("contact-name", errors.name)} />
       </Field>
@@ -123,28 +110,11 @@ export function ContactForm() {
         />
       </Field>
 
-      {/* Honeypot: hidden from people and assistive tech; bots tend to fill it. */}
-      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-        <label htmlFor="contact-website">Website</label>
-        <input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <button type="submit" disabled={status.state === "sending"} className={buttonClass("go", "md", "self-start disabled:opacity-60")}>
-          {status.state === "sending" ? "Sending…" : "Send message"}
+      <div className="flex flex-col gap-3">
+        <button type="submit" className={buttonClass("go", "md", "self-start")}>
+          Send via WhatsApp
         </button>
-        <div id="contact-status" role="status" aria-live="polite">
-          {status.state === "error" && (
-            <p className="max-w-[56ch] text-alert">
-              {status.message}{" "}
-              {status.offerInstagram && (
-                <TextLink href={instagram.href} external className="text-fg">
-                  Open Instagram
-                </TextLink>
-              )}
-            </p>
-          )}
-        </div>
+        <p className="text-meta text-steel">Opens WhatsApp with your message filled in, ready to send.</p>
       </div>
     </form>
   );

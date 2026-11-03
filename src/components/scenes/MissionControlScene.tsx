@@ -7,15 +7,21 @@ import { MathUtils, Vector3 } from "three";
 import { ScrollTrigger } from "@/lib/gsap";
 import { sceneState } from "@/lib/sceneBus";
 import { sectionIds } from "@/data/site";
-import { buildCurves, galaxyNodes, lastSectionIndex, smoothstep } from "./trajectory";
+import { anchors, at, automationLayout, buildCurves, lastSectionIndex, smoothstep, solutionsLayout } from "./trajectory";
 import { Core } from "./objects/Core";
 import { Starfield } from "./objects/Starfield";
-import { Galaxy } from "./objects/Galaxy";
+import { WorkEnvironments } from "./objects/WorkEnvironments";
 import { JourneyStations } from "./objects/JourneyStations";
 import { SkillNetwork } from "./objects/SkillNetwork";
 import { Convergence } from "./objects/Convergence";
 
 export type SceneTier = "full" | "lite";
+
+/** Environments with fixed, per-project nodes the camera can lean toward. */
+const aimTargets = [
+  ["automation", automationLayout.nodes],
+  ["solutions", solutionsLayout],
+] as const;
 
 type MissionControlSceneProps = {
   tier: SceneTier;
@@ -31,7 +37,7 @@ export default function MissionControlScene({ tier, onReady, onLost }: MissionCo
     <Canvas
       dpr={dpr}
       gl={{ antialias: tier === "full", alpha: true, powerPreference: "high-performance" }}
-      camera={{ fov: 45, near: 0.1, far: 220, position: [-3.2, 0, 9] }}
+      camera={{ fov: 45, near: 0.1, far: 240, position: [-3.2, 0, 9] }}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
         gl.domElement.addEventListener(
@@ -59,9 +65,9 @@ function SceneContents({ tier }: { tier: SceneTier }) {
 
   return (
     <>
-      <Starfield count={tier === "full" ? 1800 : 600} />
+      <Starfield count={tier === "full" ? 2400 : 800} />
       <Core dim={dim} />
-      <Galaxy dim={portrait ? 0.45 : 1} />
+      <WorkEnvironments dim={portrait ? 0.45 : 1} />
       <JourneyStations dim={dim} />
       <SkillNetwork dim={dim} />
       <Convergence dim={dim} />
@@ -136,11 +142,14 @@ function CameraRig() {
     curves.pos.getPoint(u, camera.position);
     curves.look.getPoint(u, look);
 
-    // During Work, ease the aim slightly toward the highlighted project node.
-    const weight = smoothstep(2.5, 3, t) * (1 - smoothstep(3.6, 4.1, t));
-    const active = sceneState.highlightedProject;
-    if (active >= 0 && weight > 0) aimShift.copy(galaxyNodes[active]).sub(look).multiplyScalar(0.25 * weight);
-    else aimShift.set(0, 0, 0);
+    // In the Automation Lab and Solutions Hub, ease the aim slightly toward the selected project's node.
+    aimShift.set(0, 0, 0);
+    for (const [id, nodes] of aimTargets) {
+      const weight = smoothstep(at[id] - 0.5, at[id], t) * (1 - smoothstep(at[id] + 0.4, at[id] + 0.8, t));
+      if (weight <= 0) continue;
+      const node = nodes[sceneState.highlight[id]];
+      if (node) aimShift.copy(node).add(anchors.environments[id]).sub(look).multiplyScalar(0.2 * weight);
+    }
     offset.lerp(aimShift, 1 - Math.exp(-3 * delta));
     look.add(offset);
 

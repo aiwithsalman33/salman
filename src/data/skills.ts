@@ -1,30 +1,43 @@
-export type SkillGroup = { id: string; title: string; skills: readonly string[] };
+export type SkillGroupId = "ai" | "automation" | "voice" | "product" | "creative" | "growth";
 
-// Only tools Salman can discuss confidently. No proficiency percentages (brief §5).
+export type SkillGroup = { id: SkillGroupId; title: string; summary: string; skills: readonly string[] };
+
+// Grouped by capability. No proficiency percentages.
 export const skillGroups: readonly SkillGroup[] = [
   {
-    id: "automation",
-    title: "Automation",
-    skills: ["n8n", "Make.com", "Workflow design", "API integrations", "Webhooks", "Business process automation"],
+    id: "ai",
+    title: "AI Engineering & Agentic AI",
+    summary: "Building AI applications and agents on top of LLM APIs.",
+    skills: ["Python", "LLM API Integration", "AI Agent Development", "Agentic Workflows", "Prompt Engineering", "Google AI Studio", "AI Application Development"],
   },
   {
-    id: "ai",
-    title: "AI engineering",
-    skills: ["Python", "LLM APIs", "Agentic workflows", "AI assistants", "Prompt engineering", "Google AI Studio"],
+    id: "automation",
+    title: "Workflow Automation",
+    summary: "Connecting systems so business processes run end to end.",
+    skills: ["n8n", "Make.com", "API Integration", "Webhooks", "Workflow Architecture", "Business Process Automation", "System Integration"],
   },
   {
     id: "voice",
-    title: "Voice and conversational AI",
-    skills: ["Voice agents", "Text-to-speech workflows", "Conversational AI", "WhatsApp automation", "Regional-language AI workflows"],
+    title: "Conversational & Voice AI",
+    summary: "Conversations on WhatsApp and by voice, automated.",
+    skills: ["WhatsApp Automation", "WhatsApp Business API", "AI Voice Agents", "Text-to-Speech", "Conversational AI", "Voice Workflow Automation"],
   },
   {
     id: "product",
-    title: "Product and creative technology",
-    skills: ["UI/UX thinking", "Vibe coding", "AI-assisted development", "Automation architecture", "Rapid prototyping"],
+    title: "SaaS & Product Development",
+    summary: "From prototype to product and internal system.",
+    skills: ["SaaS Product Architecture", "AI-Powered Applications", "CRM Integration", "Internal Business Systems", "Vibe Coding", "Rapid Prototyping"],
+  },
+  {
+    id: "creative",
+    title: "AI Content & Creative Technology",
+    summary: "AI avatars, video and content systems for founders and brands.",
+    skills: ["AI Avatar Generation", "AI Video Production", "AI Content Workflows", "Founder Marketing", "Social Media Automation", "Content Strategy"],
   },
   {
     id: "growth",
-    title: "Growth and content",
-    skills: ["Meta Ads", "Social media marketing", "AI content workflows", "Video production", "Educational content"],
+    title: "Business & Growth",
+    summary: "Understanding the business process before automating it.",
+    skills: ["Business Process Analysis", "Sales Automation", "Lead Management", "Marketing Automation", "Meta Ads", "Digital Marketing Operations"],
   },
 ];

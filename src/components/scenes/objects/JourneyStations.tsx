@@ -13,7 +13,7 @@ import {
   type Sprite,
 } from "three";
 import { sceneState } from "@/lib/sceneBus";
-import { anchors, palette, smoothstep } from "../trajectory";
+import { anchors, at, palette, smoothstep } from "../trajectory";
 import { getGlowTexture } from "./glowTexture";
 
 const steel = new Color(palette.steel);
@@ -38,13 +38,13 @@ export function JourneyStations({ dim }: { dim: number }) {
     const g = group.current;
     if (!g) return;
     const t = sceneState.t;
-    const fade = smoothstep(3.2, 3.8, t) * (1 - smoothstep(5, 5.6, t));
+    const fade = smoothstep(at.journey - 0.8, at.journey - 0.2, t) * (1 - smoothstep(at.journey + 1, at.journey + 1.6, t));
     g.visible = fade > 0.001;
     if (!g.visible) return;
 
     if (lineMaterial.current) lineMaterial.current.opacity = 0.3 * fade * dim;
     anchors.journey.forEach((_, i) => {
-      const on = smoothstep(3.55 + i * 0.35, 3.85 + i * 0.35, t);
+      const on = smoothstep(at.journey - 0.45 + i * 0.35, at.journey - 0.15 + i * 0.35, t);
       const mesh = meshes.current[i];
       if (mesh) {
         const material = mesh.material as MeshBasicMaterial;

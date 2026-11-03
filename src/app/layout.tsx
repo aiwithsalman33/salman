@@ -1,20 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, JetBrains_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { site } from "@/data/site";
 import { bootScript } from "@/lib/boot";
 import "./globals.css";
 
-// Archivo with its width axis: expanded for display type, normal width for body text.
-const archivo = Archivo({
+// Poppins is the only typeface. It isn't a variable font, so each weight in use is listed:
+// 400 body, 500 navigation and metadata, 600 buttons and project titles, 700 section headings, 800 hero.
+const poppins = Poppins({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
   display: "swap",
 });
 
@@ -39,7 +34,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // data-boot is set by the inline script before hydration, hence suppressHydrationWarning.
-    <html lang="en" className={`${archivo.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={poppins.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

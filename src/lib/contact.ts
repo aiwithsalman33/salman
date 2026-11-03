@@ -1,10 +1,11 @@
-/** Shared between the contact form and the /api/contact route so both validate the same way. */
+/** Contact form fields and validation. The form hands the enquiry to WhatsApp; nothing is sent to a server. */
 
 export const projectTypes = [
-  "AI automation",
-  "AI agent or LLM app",
-  "Voice AI",
-  "WhatsApp automation",
+  "n8n automation or AI agent",
+  "SaaS product or internal system",
+  "AI solution for my business",
+  "WhatsApp or voice AI",
+  "AI content or founder marketing",
   "Content or education collaboration",
   "Something else",
 ] as const;

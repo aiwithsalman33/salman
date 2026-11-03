@@ -15,7 +15,7 @@ import {
   type ShaderMaterial,
 } from "three";
 import { sceneState } from "@/lib/sceneBus";
-import { anchors, palette, smoothstep } from "../trajectory";
+import { anchors, at, palette, smoothstep } from "../trajectory";
 import { getGlowTexture } from "./glowTexture";
 
 type Orbit = { radius: number; rotation: [number, number, number]; speed: number; phase: number };
@@ -100,11 +100,13 @@ export function Core({ dim }: { dim: number }) {
     intro.current = MathUtils.damp(intro.current, 1, 2.2, delta);
 
     // At the beacon: grows in as the points converge, then shrinks away as the contact form scrolls up.
-    const atBeacon = t >= 6;
-    const finale = atBeacon ? smoothstep(7.2, 8, t) * (1 - smoothstep(8.25, 8.6, t)) * 0.6 : 1;
+    const atBeacon = t >= at.creator;
+    const finale = atBeacon
+      ? smoothstep(at.milestones + 0.2, at.contact, t) * (1 - smoothstep(at.contact + 0.25, at.contact + 0.6, t)) * 0.6
+      : 1;
     g.position.copy(atBeacon ? anchors.beacon : anchors.core);
     g.scale.setScalar(Math.max(0.0001, finale * (0.82 + 0.18 * intro.current)));
-    g.visible = finale > 0.001 && (atBeacon || t < 2.4);
+    g.visible = finale > 0.001 && (atBeacon || t < at.work + 0.4);
 
     // Subtle response to the pointer.
     g.rotation.y = MathUtils.damp(g.rotation.y, sceneState.pointer.x * 0.25, 3, delta);

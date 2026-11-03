@@ -1,5 +1,6 @@
 import { CatmullRomCurve3, Vector3 } from "three";
-import { sections, type SectionId } from "@/data/site";
+import { sectionIndex, sections, type SectionId } from "@/data/site";
+import type { CategoryId } from "@/data/work";
 
 /** Scene palette: mirrors the tokens in src/styles/tokens.css. */
 export const palette = {
@@ -10,41 +11,41 @@ export const palette = {
   depth: "#9a82ff",
 } as const;
 
+/** Section positions in scroll units (t), so scene timing follows the section order automatically. */
+export const at = Object.fromEntries(sections.map(({ id }) => [id, sectionIndex(id)])) as Record<SectionId, number>;
+
+export const lastSectionIndex = sections.length - 1;
+
 /** World anchors along the flight path (the camera travels toward −z). */
 export const anchors = {
   core: new Vector3(0, 0, 0),
-  // Framed in the empty right-hand column beside the project list.
-  galaxy: new Vector3(6.4, 0, -40),
+  // Each work environment is framed in the right-hand part of the screen beside its section's text.
+  environments: {
+    // Raised so they sit beside the category header, above the project preview panel.
+    automation: new Vector3(6.4, 0.9, -40),
+    products: new Vector3(6.4, 0.9, -60),
+    solutions: new Vector3(6.4, 0.9, -80),
+    studio: new Vector3(6.4, 0.9, -100),
+  } satisfies Record<CategoryId, Vector3>,
+  network: new Vector3(0, 0, -122),
   // A short vertical column at the right edge, mirroring the timeline (oldest at the top).
-  journey: [new Vector3(9.4, 2.2, -64), new Vector3(9.4, 0.2, -66), new Vector3(9.4, -1.8, -68)],
-  network: new Vector3(0, 0, -92),
-  beacon: new Vector3(0, 0.6, -118),
+  journey: [new Vector3(9.4, 2.2, -142), new Vector3(9.4, 0.2, -144), new Vector3(9.4, -1.8, -146)],
+  beacon: new Vector3(0, 0.6, -176),
 } as const;
 
-/** Project nodes: the 2D constellation layout (600×520) mapped into world space around the galaxy anchor. */
-const galaxyLayout = [
-  [150, 120],
-  [330, 80],
-  [470, 190],
-  [400, 330],
-  [210, 300],
-  [90, 430],
-  [510, 440],
-] as const;
+/** Automation Lab layout (local): a trigger fans out to one node per project, which feed an output. */
+export const automationLayout = {
+  trigger: new Vector3(-2.4, 0, 0),
+  output: new Vector3(2.4, 0, 0),
+  nodes: [1.8, 0.9, 0, -0.9, -1.8].map((y) => new Vector3(0, y, 0)),
+};
 
-export const galaxyNodes = galaxyLayout.map(
-  ([x, y], i) => new Vector3((x - 300) / 90, -(y - 260) / 90, ((i % 3) - 1) * 0.6).add(anchors.galaxy),
-);
-
-export const galaxyLinks: readonly [number, number][] = [
-  [0, 1],
-  [1, 2],
-  [2, 3],
-  [3, 4],
-  [4, 0],
-  [4, 5],
-  [3, 6],
-  [1, 3],
+/** Business Solutions Hub layout (local): one hub, one node per delivered solution. */
+export const solutionsLayout = [
+  new Vector3(-2.3, 1.5, 0),
+  new Vector3(2.3, 1.5, 0),
+  new Vector3(-2.3, -1.5, 0),
+  new Vector3(2.3, -1.5, 0),
 ];
 
 type Vec = readonly [number, number, number];
@@ -53,14 +54,17 @@ type Vec = readonly [number, number, number];
 const keyframes: Record<SectionId, { pos: Vec; look: Vec }> = {
   top: { pos: [-3.2, 0, 9], look: [-3.2, 0, 0] }, // core sits right of the headline
   about: { pos: [1.4, 0.3, -1.5], look: [1.6, 0.2, -12] }, // flown through the orbit rings
-  capabilities: { pos: [0.4, 0, -14], look: [0.6, 0, -26] },
-  work: { pos: [0, 0, -28], look: [2.4, 0, -40] }, // galaxy framed in the right half
-  journey: { pos: [1.2, 0.4, -50], look: [1.2, 0.2, -66] },
-  skills: { pos: [0, 0, -80], look: [0, 0, -92] },
-  creator: { pos: [-1, 0.4, -96], look: [-2, 0, -108] },
-  milestones: { pos: [0, -0.3, -100], look: [0, -0.4, -118] },
+  work: { pos: [0.4, 0, -14], look: [0.6, 0, -26] },
+  automation: { pos: [0, 0, -28], look: [2.4, 0, -40] },
+  products: { pos: [0, 0.2, -48], look: [2.4, 0, -60] },
+  solutions: { pos: [0, -0.2, -68], look: [2.4, 0, -80] },
+  studio: { pos: [0, 0.2, -88], look: [2.4, 0, -100] },
+  skills: { pos: [0, 0, -110], look: [0, 0, -122] },
+  journey: { pos: [1.2, 0.4, -128], look: [1.2, 0.2, -144] },
+  creator: { pos: [-1, 0.4, -150], look: [-2, 0, -162] },
+  milestones: { pos: [0, -0.3, -156], look: [0, -0.4, -176] },
   // The core returns at the beacon, sitting above centre behind the closing line.
-  contact: { pos: [0, -0.7, -110], look: [0, -0.7, -118] },
+  contact: { pos: [0, -0.7, -168], look: [0, -0.7, -176] },
 };
 
 /**
@@ -68,26 +72,22 @@ const keyframes: Record<SectionId, { pos: Vec; look: Vec }> = {
  * smaller value so objects framed beside the text on desktop sit closer to centre on a phone.
  */
 export function buildCurves(lateral: number) {
-  const pos = sections.map(({ id }) => {
-    const [x, y, z] = keyframes[id].pos;
-    return new Vector3(x * lateral, y, z);
-  });
-  const look = sections.map(({ id }) => {
-    const [x, y, z] = keyframes[id].look;
-    return new Vector3(x * lateral, y, z);
-  });
+  const toVector = ([x, y, z]: Vec) => new Vector3(x * lateral, y, z);
   // getPoint(i / (n − 1)) lands exactly on keyframe i, so scroll position maps to sections directly.
   return {
-    pos: new CatmullRomCurve3(pos, false, "centripetal"),
-    look: new CatmullRomCurve3(look, false, "centripetal"),
+    pos: new CatmullRomCurve3(sections.map(({ id }) => toVector(keyframes[id].pos)), false, "centripetal"),
+    look: new CatmullRomCurve3(sections.map(({ id }) => toVector(keyframes[id].look)), false, "centripetal"),
   };
 }
-
-export const lastSectionIndex = sections.length - 1;
 
 export function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
+}
+
+/** 0→1 as section `index` arrives, 1→0 as the camera leaves for the next one. */
+export function presence(t: number, index: number) {
+  return smoothstep(index - 1.1, index - 0.2, t) * (1 - smoothstep(index + 0.5, index + 0.9, t));
 }
 
 /** Deterministic random numbers so the scene looks the same on every load. */

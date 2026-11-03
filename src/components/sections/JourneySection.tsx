@@ -21,18 +21,23 @@ export function JourneySection() {
                 }`}
               />
 
-              <p className="telemetry pl-6 pt-0.5 text-steel sm:pl-10 lg:pl-0 lg:text-right">
-                <time dateTime={role.start.iso}>{role.start.label}</time>
-                {" – "}
-                {role.end ? <time dateTime={role.end.iso}>{role.end.label}</time> : "Present"}
+              <p className="telemetry pt-0.5 pl-6 text-steel sm:pl-10 lg:pl-0 lg:text-right">
+                {role.start ? (
+                  <>
+                    <time dateTime={role.start.iso}>{role.start.label}</time>
+                    {" – "}
+                    {role.end ? <time dateTime={role.end.iso}>{role.end.label}</time> : "Present"}
+                  </>
+                ) : (
+                  role.current && <span className="text-signal">Current role</span>
+                )}
               </p>
 
               <div className="pb-16 pl-6 sm:pl-10 lg:pl-0">
-                <h3 className="display mt-2 text-h3 lg:mt-0">{role.role}</h3>
-                <p className="mt-2 text-steel">
-                  {role.org ?? "Current role"}
-                  {role.location && `, ${role.location}`}
-                </p>
+                <h3 className="mt-2 text-h3 font-semibold lg:mt-0">{role.role}</h3>
+                <p className="mt-2 text-lead text-steel">{role.org}</p>
+
+                {role.focus && <p className="mt-5 max-w-[60ch]">Focus: {role.focus}</p>}
 
                 {role.highlights.length > 0 && (
                   <ul className="mt-6 flex max-w-[60ch] flex-col gap-2">
@@ -44,27 +49,13 @@ export function JourneySection() {
                     ))}
                   </ul>
                 )}
-
-                {role.awards && (
-                  <div className="mt-6">
-                    <h4 className="text-meta font-semibold text-steel">Awards in 2025</h4>
-                    <ul className="mt-3 flex flex-col gap-2">
-                      {role.awards.map((award) => (
-                        <li key={award} className="flex items-center gap-3">
-                          <span aria-hidden="true" className="size-2 shrink-0 bg-go" />
-                          {award}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             </li>
           ))}
         </ol>
 
         <p className="max-w-[60ch] text-steel lg:ml-[268px]">
-          Alongside these roles: independent freelance automation work, and the AI With Salman creator channel.
+          Alongside these roles: freelance AI engineering for businesses, and the AI With Salman creator channel.
         </p>
       </div>
     </section>

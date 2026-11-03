@@ -18,9 +18,9 @@ export function Starfield({ count }: { count: number }) {
     for (let i = 0; i < count; i++) {
       let x = (rand() - 0.5) * 50;
       const y = (rand() - 0.5) * 30;
-      const z = 15 - rand() * 145;
+      const z = 15 - rand() * 205;
       // Keep a clear corridor around the camera path so no point passes right in front of the lens.
-      if (Math.abs(x) < 4 && Math.abs(y) < 3) x += x < 0 ? -4 : 4;
+      if (Math.abs(x) < 5.5 && Math.abs(y) < 3.5) x += x < 0 ? -5.5 : 5.5;
       positions.set([x, y, z], i * 3);
       c.copy(rand() < 0.25 ? depth : steel).multiplyScalar(0.4 + rand() * 0.6);
       colors.set([c.r, c.g, c.b], i * 3);

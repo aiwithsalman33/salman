@@ -2,6 +2,8 @@
 
 Source brief: [`Salman_Creative_AI_Portfolio_Brief.md`](../Salman_Creative_AI_Portfolio_Brief.md). This document is the Phase 1 output (brief §17). Nothing is built yet; it needs sign-off first.
 
+> **Content revision, 2026-11-03.** Salman supplied a revised content and positioning brief: Axxeler as current employer, four work categories (13 projects) each with its own 3D environment (Automation Lab, Product Universe, Business Solutions Hub, Creator Studio), six skill groups, a corrected journey, Poppins as the only typeface, and new navigation. Content lives in `src/data/` (`work.ts`, `skills.ts`, `experience.ts`, `achievements.ts`); the "What I do" capability modules were retired and their accordion now drives Skills. Where this document conflicts with that revision, the revision wins.
+
 Repository state: empty apart from the brief and `.claude/skills/`. No existing framework to preserve, so the brief's recommended stack is used as-is.
 
 ---
@@ -36,6 +38,8 @@ The two accents carry **meaning**, not decoration: cyan = "you can touch this / 
 Grain: a 3–4% static SVG noise layer over the canvas, not over text.
 
 ### Type
+
+> **Changed 2026-11-03 at Salman's request:** the site now uses **Poppins** (700 for display, 400–600 for body/UI) in place of Archivo; JetBrains Mono stays for telemetry. Poppins has no width axis, so the boot moment reveals the headline line by line (blur/rise) instead of widening it. The table below is the original Phase 1 proposal.
 
 | Role | Face | Setting |
 |---|---|---|
@@ -210,11 +214,11 @@ Content lives in `src/data/*.ts`, with a `provenance` field on every project and
 
 ## 8. Open questions (needed before launch, not before building)
 
-1. **Contact email** and **form delivery**: Formspree/Web3Forms (no backend, free tier) or a Next route handler sending via Resend (needs an API key on Vercel).
+1. ~~**Contact email** and **form delivery**~~ Decided 2026-11-03: the form opens WhatsApp with the enquiry pre-filled (no backend). Original options: Formspree/Web3Forms (no backend, free tier) or a Next route handler sending via Resend (needs an API key on Vercel).
 2. **YouTube channel URL**: omitted until confirmed.
 3. **"250+ learners"**: still accurate? Omitted until confirmed.
 4. **ZenXAI**: a one- or two-line summary of the work you can share publicly.
-5. **Portrait**: a real photo for About, or keep the abstract frame?
+5. ~~**Portrait**: a real photo for About, or keep the abstract frame?~~ Supplied 2026-11-03; used in the About frame (`src/assets/salman-portrait.jpg`).
 6. **Approved assets** (brief §15): until supplied, project panels use clearly labelled conceptual visuals (*"Concept visual — not a product screenshot"*).
 7. **Domain** (for canonical URL, sitemap, OG).
 

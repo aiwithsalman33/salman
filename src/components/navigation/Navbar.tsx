@@ -2,6 +2,7 @@ import { navItems } from "@/data/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { MobileMenu } from "./MobileMenu";
+import { WorkMenu } from "./WorkMenu";
 import { Wordmark } from "./Wordmark";
 
 export function Navbar() {
@@ -13,12 +14,16 @@ export function Navbar() {
         </a>
 
         <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-7 text-meta">
+          <ul className="flex items-center gap-6 text-meta">
             {navItems.map((item) => (
               <li key={item.id}>
-                <a href={`#${item.id}`} className="py-2 text-steel transition-colors hover:text-fg">
-                  {item.label}
-                </a>
+                {item.id === "work" ? (
+                  <WorkMenu />
+                ) : (
+                  <a href={`#${item.id}`} className="py-2 font-medium text-steel transition-colors hover:text-fg">
+                    {item.label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>

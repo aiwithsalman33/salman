@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { navItems } from "@/data/site";
+import { workCategories } from "@/data/work";
 import { buttonClass } from "@/components/ui/Button";
 import { Wordmark } from "./Wordmark";
 
@@ -37,13 +38,27 @@ export function MobileMenu() {
             </button>
           </div>
 
-          <nav aria-label="Mobile" className="flex-1 py-8">
+          <nav aria-label="Mobile" className="flex-1 py-6">
             <ul className="flex flex-col">
               {navItems.map((item) => (
                 <li key={item.id} className="border-b border-hairline">
-                  <a href={`#${item.id}`} onClick={close} className="display block py-4 text-h3">
+                  <a href={`#${item.id}`} onClick={close} className="block py-3.5 text-h3 font-semibold">
                     {item.label}
                   </a>
+                  {item.id === "work" && (
+                    <ul className="flex flex-col pb-3 pl-4">
+                      {workCategories.map((category) => (
+                        <li key={category.id}>
+                          <a href={`#${category.id}`} onClick={close} className="flex items-baseline gap-3 py-2 font-medium text-steel">
+                            <span className="telemetry" style={{ color: `var(--color-${category.accent})` }}>
+                              {category.number}
+                            </span>
+                            {category.title}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
             </ul>

@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# original planning brief: kept local, it names a former employer that must not be published
+/Salman_Creative_AI_Portfolio_Brief.md
 
 # vercel
 .vercel

@@ -1,4 +1,4 @@
-import { email, instagram, topmate } from "@/data/social-links";
+import { email, instagram, topmate, whatsapp } from "@/data/social-links";
 import { ButtonLink } from "@/components/ui/Button";
 import { RevealTitle } from "@/components/motion/RevealTitle";
 import { ContactForm } from "./ContactForm";
@@ -29,6 +29,11 @@ export function ContactSection() {
               <li>
                 <ButtonLink href={topmate.href} variant="outline" external>
                   Book a session
+                </ButtonLink>
+              </li>
+              <li>
+                <ButtonLink href={whatsapp.href} variant="outline" external>
+                  WhatsApp
                 </ButtonLink>
               </li>
               <li>

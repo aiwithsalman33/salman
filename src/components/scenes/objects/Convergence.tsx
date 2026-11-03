@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { BufferGeometry, Vector3, type Group, type PointsMaterial } from "three";
 import { sceneState } from "@/lib/sceneBus";
-import { anchors, palette, smoothstep } from "../trajectory";
+import { anchors, at, palette, smoothstep } from "../trajectory";
 
 const COUNT = 140;
 
@@ -30,8 +30,8 @@ export function Convergence({ dim }: { dim: number }) {
     const g = group.current;
     if (!g) return;
     const t = sceneState.t;
-    const gather = smoothstep(6.6, 7.8, t);
-    const opacity = smoothstep(6.3, 6.9, t) * (1 - smoothstep(7.7, 8, t));
+    const gather = smoothstep(at.creator + 0.6, at.milestones + 0.8, t);
+    const opacity = smoothstep(at.creator + 0.3, at.creator + 0.9, t) * (1 - smoothstep(at.milestones + 0.7, at.contact, t));
     g.visible = opacity > 0.001;
     if (!g.visible) return;
     g.scale.setScalar(Math.max(0.05, 9 * (1 - gather)));
