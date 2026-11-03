@@ -1,0 +1,44 @@
+/* Design tokens: see docs/DESIGN_PLAN.md §2. `static` keeps every token available as a CSS variable (SVG and the 3D scene read them). */
+@theme static {
+  --color-void: #080b10;
+  --color-graphite: #0d1118;
+  --color-signal: #5ce1e6;
+  --color-go: #c7f36b;
+  --color-fg: #f3f5f7;
+  --color-steel: #9aa5b1;
+  --color-depth: #9a82ff;
+  --color-hairline: rgb(154 165 177 / 0.14);
+  --color-hairline-strong: rgb(154 165 177 / 0.28);
+  /* Form errors only. */
+  --color-alert: #ff8a8a;
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Fluid type scale: 12 · 14 · 17 · 22 · 30 · 56 · 92 */
+  --text-micro: 0.75rem;
+  --text-micro--line-height: 1.4;
+  --text-meta: 0.875rem;
+  --text-meta--line-height: 1.45;
+  --text-body: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+  --text-body--line-height: 1.6;
+  --text-lead: clamp(1.125rem, 1.02rem + 0.45vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-h3: clamp(1.375rem, 1.17rem + 0.9vw, 1.875rem);
+  --text-h3--line-height: 1.1;
+  --text-h2: clamp(2rem, 1.25rem + 3.1vw, 3.5rem);
+  --text-h2--line-height: 1;
+  --text-h1: clamp(2.125rem, 0.9rem + 5.2vw, 5.75rem);
+  --text-h1--line-height: 0.94;
+
+  --radius-tag: 4px;
+  --radius-dialog: 16px;
+}
+
+:root {
+  --rail-w: 56px;
+  --header-h: 64px;
+  /* Written by ScrollProgress (0–1). */
+  --scroll-progress: 0;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}

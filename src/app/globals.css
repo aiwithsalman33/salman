@@ -1,0 +1,661 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-void);
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 100svh;
+    background: var(--color-void);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Static grain, under the content. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-void);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  /* Page container: 16px gutter on phones, rail gutter + 72px margin on desktop. */
+  .shell {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+
+  @media (min-width: 640px) {
+    .shell {
+      padding-inline: 32px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .shell {
+      padding-left: calc(var(--rail-w) + 40px);
+      padding-right: 72px;
+    }
+  }
+
+  .section {
+    padding-block: clamp(96px, 11vw, 160px);
+  }
+
+  /* Display type: Archivo's width axis carries the voice. Narrower on phones so long words fit. */
+  .display {
+    font-stretch: 112.5%;
+    font-weight: 780;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 1024px) {
+    .display {
+      font-stretch: 125%;
+    }
+  }
+
+  .telemetry {
+    font-family: var(--font-mono);
+    font-size: var(--text-micro);
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 100;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--color-go);
+    color: var(--color-void);
+    font-weight: 600;
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+}
+
+/* ---------- Boot sequence: the one orchestrated load moment ----------
+   Lines appear 0.1–1.0s, the overlay fades at 1.4s, and the hero headline widens from 62% as the core ignites.
+   Repeat visits (data-boot="repeat") and "Skip intro" (data-boot="skipped") go straight to the ignite. */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  background: var(--color-void);
+  pointer-events: none;
+  animation: boot-out 0.3s ease-in 1.4s both;
+}
+
+.boot-line {
+  animation: boot-line-in 0.2s ease-out both;
+}
+
+.boot-line:nth-child(1) { animation-delay: 0.1s; }
+.boot-line:nth-child(2) { animation-delay: 0.4s; }
+.boot-line:nth-child(3) { animation-delay: 0.7s; }
+.boot-line:nth-child(4) { animation-delay: 1s; }
+
+.boot-skip {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 91;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--color-hairline-strong);
+  color: var(--color-steel);
+  animation: boot-out 0.2s ease-in 1.4s both;
+}
+
+.boot-skip:hover {
+  color: var(--color-fg);
+  border-color: var(--color-steel);
+}
+
+@keyframes boot-line-in {
+  from { opacity: 0; translate: 0 6px; }
+}
+
+@keyframes boot-out {
+  to { opacity: 0; visibility: hidden; }
+}
+
+html[data-boot] .boot,
+html[data-boot] .boot-skip {
+  display: none;
+}
+
+@keyframes ignite {
+  from { font-stretch: 62%; opacity: 0; }
+}
+
+@keyframes core-ignite {
+  from { opacity: 0; scale: 0.82; }
+}
+
+@keyframes follow-in {
+  from { opacity: 0; translate: 0 10px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-title {
+    animation: ignite 0.9s var(--ease-out-expo) 1.4s backwards;
+  }
+
+  .hero-core {
+    animation: core-ignite 1.3s var(--ease-out-expo) 1.3s backwards;
+  }
+
+  .hero-follow {
+    animation: follow-in 0.6s var(--ease-out-expo) 1.85s backwards;
+  }
+
+  html[data-boot] .hero-title,
+  html[data-boot] .hero-core {
+    animation-delay: 0s;
+  }
+
+  html[data-boot] .hero-follow {
+    animation-delay: 0.35s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot,
+  .boot-skip {
+    display: none;
+  }
+}
+
+/* ---------- 3D scene (SceneLoader) ----------
+   The canvas fades in on its first frame; the SVG drawings it replaces fade out. Without 3D they simply stay. */
+.scene-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+html[data-scene="3d"] .scene-canvas {
+  opacity: 1;
+}
+
+.hero-core,
+.constellation-2d {
+  transition: opacity 0.8s ease;
+}
+
+html[data-scene="3d"] .hero-core,
+html[data-scene="3d"] .constellation-2d {
+  opacity: 0;
+}
+
+/* ---------- Scroll progress (value from ScrollProgress) ---------- */
+.progress-bar {
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 2px;
+  background: var(--color-signal);
+  transform-origin: left;
+  scale: var(--scroll-progress) 1;
+}
+
+/* ---------- Trajectory rail ---------- */
+.rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: var(--rail-w);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--header-h);
+}
+
+.rail::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--header-h) + 32px);
+  bottom: 32px;
+  left: 50%;
+  width: 1px;
+  background: var(--color-hairline);
+}
+
+/* Progress fill along the rail line. */
+.rail::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--header-h) + 32px);
+  bottom: 32px;
+  left: 50%;
+  width: 1px;
+  background: var(--color-signal);
+  transform-origin: top;
+  scale: 1 var(--scroll-progress);
+}
+
+.rail-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rail-link {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.rail-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-void);
+  border: 1px solid var(--color-steel);
+}
+
+.rail-link[aria-current="location"] .rail-dot {
+  width: 11px;
+  height: 11px;
+  background: var(--color-signal);
+  border-color: var(--color-signal);
+  box-shadow: 0 0 0 4px rgb(92 225 230 / 0.16);
+}
+
+.rail-label {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  translate: 0 -50%;
+  padding: 3px 8px;
+  border-radius: var(--radius-tag);
+  background: var(--color-graphite);
+  border: 1px solid var(--color-hairline);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rail-link:hover .rail-label,
+.rail-link:focus-visible .rail-label {
+  opacity: 1;
+}
+
+.rail-readout {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  translate: -50% 0;
+  padding-block: 10px;
+  background: var(--color-void);
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  color: var(--color-signal);
+}
+
+/* ---------- Mobile menu ---------- */
+dialog.menu-sheet {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: var(--color-void);
+  color: var(--color-fg);
+}
+
+dialog.menu-sheet::backdrop {
+  background: var(--color-void);
+}
+
+/* ---------- Capability console bank ---------- */
+.bank {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-hairline);
+}
+
+.bank-module {
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.bank-trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+  padding-block: 22px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bank-trigger[aria-expanded="true"] {
+  color: var(--color-signal);
+}
+
+.bank-icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--color-steel);
+}
+
+.bank-trigger[aria-expanded="true"] .bank-icon {
+  color: var(--color-signal);
+}
+
+.bank-panel {
+  padding-bottom: 32px;
+}
+
+@media (min-width: 1024px) {
+  .bank {
+    flex-direction: row;
+    height: 520px;
+    border: 1px solid var(--color-hairline);
+  }
+
+  .bank-module {
+    display: flex;
+    flex: 0 0 92px;
+    flex-direction: column;
+    min-width: 0;
+    border-bottom: 0;
+    border-right: 1px solid var(--color-hairline);
+  }
+
+  .bank-module:last-child {
+    border-right: 0;
+  }
+
+  /* Same basis, grow 0 → 1, so the width change can transition. */
+  .bank-module[data-open="true"] {
+    flex: 1 0 92px;
+    background: var(--color-graphite);
+  }
+
+  .bank-module[data-open="false"] .bank-heading {
+    flex: 1;
+    display: flex;
+  }
+
+  .bank-module[data-open="false"] .bank-trigger {
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 0;
+  }
+
+  .bank-module[data-open="false"] .bank-trigger:hover {
+    background: rgb(154 165 177 / 0.05);
+  }
+
+  .bank-module[data-open="false"] .bank-title {
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    white-space: nowrap;
+  }
+
+  .bank-module[data-open="true"] .bank-trigger {
+    padding: 36px 44px 0;
+    cursor: default;
+  }
+
+  .bank-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 24px 44px 44px;
+  }
+}
+
+/* ---------- Project case study (side sheet on desktop, full screen on phones) ---------- */
+dialog.case-sheet {
+  margin: 0;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: var(--color-graphite);
+  color: var(--color-fg);
+}
+
+dialog.case-sheet::backdrop {
+  background: rgb(8 11 16 / 0.72);
+  backdrop-filter: blur(4px);
+}
+
+@media (min-width: 768px) {
+  dialog.case-sheet {
+    inset: 0 0 0 auto;
+    width: min(680px, 92vw);
+    border-left: 1px solid var(--color-hairline-strong);
+    border-radius: var(--radius-dialog) 0 0 var(--radius-dialog);
+  }
+}
+
+/* ---------- Project rows: cursor-following light (position from ProjectRow) ---------- */
+.project-row {
+  position: relative;
+  isolation: isolate;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 12px;
+    background: radial-gradient(480px circle at var(--mx, 50%) var(--my, 50%), rgb(92 225 230 / 0.08), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .project-row:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Only bleed past the row where the page margin leaves room for it. */
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  .project-row::before {
+    inset: 0 -20px;
+  }
+}
+
+/* ---------- User-triggered transitions ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* Case study: slides in from the right on desktop, up from below on phones. */
+  dialog.case-sheet {
+    --sheet-from: 0 24px;
+    transition:
+      translate 0.45s var(--ease-out-expo),
+      opacity 0.3s ease,
+      overlay 0.45s allow-discrete,
+      display 0.45s allow-discrete;
+  }
+
+  dialog.case-sheet:not([open]) {
+    translate: var(--sheet-from);
+    opacity: 0;
+  }
+
+  @starting-style {
+    dialog.case-sheet[open] {
+      translate: var(--sheet-from);
+      opacity: 0;
+    }
+  }
+
+  dialog.case-sheet::backdrop {
+    opacity: 0;
+    transition:
+      opacity 0.3s ease,
+      overlay 0.3s allow-discrete,
+      display 0.3s allow-discrete;
+  }
+
+  dialog.case-sheet[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    dialog.case-sheet[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  @media (min-width: 768px) {
+    dialog.case-sheet {
+      --sheet-from: 40px 0;
+    }
+  }
+
+  dialog.menu-sheet {
+    transition:
+      opacity 0.25s ease,
+      overlay 0.25s allow-discrete,
+      display 0.25s allow-discrete;
+  }
+
+  dialog.menu-sheet:not([open]) {
+    opacity: 0;
+  }
+
+  @starting-style {
+    dialog.menu-sheet[open] {
+      opacity: 0;
+    }
+  }
+
+  /* Capability modules: the opened module widens; its content settles in after. */
+  .bank-module {
+    transition:
+      flex-grow 0.55s var(--ease-out-expo),
+      background-color 0.3s ease;
+  }
+
+  .bank-trigger {
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .bank-panel:not([hidden]) {
+    animation: follow-in 0.5s var(--ease-out-expo) 0.12s backwards;
+  }
+}
+
+/* ---------- Form fields ---------- */
+.field {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-hairline-strong);
+  background: var(--color-graphite);
+  color: var(--color-fg);
+}
+
+.field::placeholder {
+  color: rgb(154 165 177 / 0.7);
+}
+
+.field:hover {
+  border-color: rgb(154 165 177 / 0.45);
+}
+
+.field:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+.field[aria-invalid="true"] {
+  border-color: var(--color-alert);
+}
+
+/* Required select still on its empty "Choose one" option. */
+select.field:invalid {
+  color: rgb(154 165 177 / 0.7);
+}
+
+select.field option {
+  color: var(--color-fg);
+}
+
+select.field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239AA5B1' stroke-width='1.5'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
